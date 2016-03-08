@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:aop="http://www.springframework.org/schema/aop" xmlns:p="http://www.springframework.org/schema/p"
+		xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+		xmlns:jee="http://www.springframework.org/schema/jee"
+		xsi:schemaLocation="
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+			http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.0.xsd">
+
+	
+	<context:property-placeholder location="classpath:web.properties" />
+	
+	<bean id="joaDataSource" class="cn.com.cippus.web.common.DataSourceFactory"
+		factory-method="getInstance" >
+		<constructor-arg>
+	 		<value>/web.properties</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="joaJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="joaDataSource"></property>
+	</bean>
+		
+	<bean id="joaSimpleDao" name="joaSimpleDao" class="cn.com.cippus.web.dao.impl.${cippus.db.type}SimpleDaoImpl"> 
+		<property name="jdbcTemplate" ref="joaJdbcTemplate"></property>
+	</bean>
+	<!-- Transaction manager for a single JDBC DataSource (alternative to JTA) -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+			p:dataSource-ref="joaDataSource"/>
+</beans>

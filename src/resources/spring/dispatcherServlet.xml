@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+
+	<context:component-scan base-package="cn.com.cippus.web.controller" />
+	<context:component-scan base-package="cn.com.cippus.web.service" />
+	<context:property-placeholder location="classpath:web.properties" />
+	<!-- spring 3.0.4 新增资源映射，cool! -->
+	<mvc:resources location="classpath:/resources/www/res/js/"
+		mapping="/js/**" />
+	<mvc:resources location="classpath:/resources/www/res/css/"
+		mapping="/css/**" />
+	<mvc:resources location="classpath:/resources/www/res/images/"
+		mapping="/images/**" />
+    <mvc:resources location="classpath:/resources/www/views/kindEditor/"
+		mapping="/kindEditor/**" />
+
+
+	<!-- HANDLER MAPPING RULES -->
+	<!-- Maps requests to @Controllers based on @RequestMapping("path") annotation 
+		values If no annotation-based path mapping is found, Spring MVC sends a 404 
+		response and logs a pageNotFound warning. -->
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
+		<property name="order" value="1" />
+		<property name="useDefaultSuffixPattern" value="false" />
+	</bean>
+	<!-- REGISTERED HANDLER TYPES -->
+	<!-- Enables annotated @Controllers; responsible for invoking an annotated 
+		POJO @Controller when one is mapped. -->
+	<bean id="mappingJacksonHttpMessageConverter"
+		class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
+	</bean>
+	<util:list id="messageConverters">
+		<ref bean="mappingJacksonHttpMessageConverter" />
+	</util:list>
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="messageConverters" ref="messageConverters" />
+	</bean>
+
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerExceptionResolver">
+		<property name="messageConverters" ref="messageConverters" />
+	</bean>
+	<!-- 我们用不到velocity <bean id="velocityConfig" class="org.springframework.web.servlet.view.velocity.VelocityConfigurer"> 
+		<property name="resourceLoaderPath" value="classpath:/resources/www/views/"></property> 
+		<property name="preferFileSystemAccess" value="false" /> <property name="velocityProperties"> 
+		<props> <prop key="input.encoding">UTF-8</prop> <prop key="output.encoding">UTF-8</prop> 
+		<prop key="contentType">text/html;charset=UTF-8</prop> </props> </property> 
+		</bean> <bean id="velocityViewResolver" class="org.springframework.web.servlet.view.velocity.VelocityViewResolver"> 
+		<property name="cache" value="true" /> <property name="prefix" value="" /> 
+		<property name="suffix" value=".htm" /> <property name="contentType" value="text/html;charset=UTF-8" 
+		/> <property name="requestContextAttribute" value="rc" /> <property name="exposeRequestAttributes" 
+		value="true" /> </bean> -->
+
+	<bean id="jspViewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass"
+			value="org.springframework.web.servlet.view.JstlView" />
+		<property name="prefix" value="WEB-INF/classes/resources/www/views/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+	<bean id="jsonView"
+		class="org.springframework.web.servlet.view.json.MappingJacksonJsonView">
+		<property name="contentType" value="text/html;charset=UTF-8" />
+	</bean>
+	
+	<bean id="viewResolver" class="cn.com.cippus.web.view.MutilViewResolver">
+		<property name="parameterName" value="format"></property>
+	</bean>
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+	</bean>
+	<bean id="exceptionResolver"
+		class="cn.com.cippus.web.handler.ControllerHandlerExceptionResolver" />
+
+	<bean id="localeResolver"
+		class="org.springframework.web.servlet.i18n.SessionLocaleResolver">
+		<property name="defaultLocale" value="${defaultLocale}"></property>
+	</bean>
+	<bean id="themeResolver"
+		class="org.springframework.web.servlet.theme.SessionThemeResolver">
+		<property name="defaultThemeName" value="${defaultThemeName}" />
+	</bean>
+</beans>
